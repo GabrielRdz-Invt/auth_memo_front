@@ -1,0 +1,11 @@
+body{
+    background: #eb9a31;
+    background: linear-gradient(166deg,rgba(212, 36, 36, 1) 0%, rgba(255, 217, 217, 1) 50%, rgba(199, 97, 42, 1) 100%);
+}
+
+.main-container {
+    min-height: 100vh;
+    padding: 2em;
+    background-color: white;
+    border-radius:4px;
+}
