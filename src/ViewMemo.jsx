@@ -27,10 +27,11 @@ export default function ViewMemo() {
         }).then((result) =>{
             if (result.isConfirmed)
             {
-                fetch("http://localhost:5134/AuthMemos/CancelMemo", {
+                fetch("https://ime-oa.inventec.com:460/AuthMemo/AuthMemos/CancelMemo", {
                     method: "put",
                     headers: {"Content-Type" : "application/json"},
                     body: JSON.stringify({ id_memo: id_memo }),
+                    credentials: "include",
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -57,13 +58,13 @@ export default function ViewMemo() {
                 text: "There is no contract file attached to this memo.",
             });
         }
-        const url = "http://localhost:5134/AuthMemos/DownloadContract?fileName=" +fileName;
+        const url = "https://ime-oa.inventec.com:460/AuthMemo/AuthMemos/DownloadContract?fileName=" +fileName;
         window.open(url, "_blank");
     }
 
     // esto es lo equivalente a un onLoad()
     useEffect(() => {
-        fetch("http://localhost:5134/AuthMemos/GetAuthMemoById?id_memo=" + id_memo)
+        fetch("https://ime-oa.inventec.com:460/AuthMemo/AuthMemos/GetAuthMemoById?id_memo=" + id_memo, {credentials: "include", headers: {"Content-Type" : "application/json"}})
         .then(res => res.json())
         .then(data => {
             // console.log(data.data)
@@ -95,7 +96,7 @@ export default function ViewMemo() {
                 <div className="row">
                     <div className="col-md-10">
                         <button className="btn btn-dark btn-sm mb-4" onClick={() => window.print()} disabled={isCancelled}><i className="bi bi-file-earmark-pdf" /> Export memo to PDF</button>
-                        <button className="btn btn-dark btn-sm mb-4 mx-1" onClick={cancelMemo} disabled={isCancelled}><i className="bi bi-file-x" /> Cancel Memo</button>
+                        {/* <button className="btn btn-dark btn-sm mb-4 mx-1" onClick={cancelMemo} disabled={isCancelled}><i className="bi bi-file-x" /> Cancel Memo</button> */}
                     </div>
                     <div className="col-md-2">
                         {memo && (<><button className="btn btn-dark btn-sm mb-3" onClick={downloadContract} disabled={isCancelled}>

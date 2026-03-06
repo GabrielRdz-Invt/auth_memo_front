@@ -19,15 +19,17 @@ export default function Flows() {
 
         let url = "";
         if (filter != null) {
-            url = "http://localhost:5134/ApprovalFlow/GetApprovalFlow?filter=" + filter;
+            // url = "http://localhost:5134/ApprovalFlow/GetApprovalFlow?filter=" + filter;
+            url = "https://ime-oa.inventec.com:460/AuthMemo/ApprovalFlow/GetApprovalFlow?filter=" + filter;
         }
         else {
-            url = "http://localhost:5134/ApprovalFlow/GetApprovalFlow";
+            // url = "http://localhost:5134/ApprovalFlow/GetApprovalFlow";
+            url = "https://ime-oa.inventec.com:460/AuthMemo/ApprovalFlow/GetApprovalFlow";
         }
         fetch(url, {
             method: "get",
             headers: {"Content-Type" : "application/json"},
-            // body: JSON.stringify({ id_memo: id_to_cancel }),
+            credentials: "include",
         })
         .then((res) => {
             if (!res.ok)
@@ -54,10 +56,6 @@ export default function Flows() {
         });
     }
 
-    function getFlowById() {
-        // under construction
-    }
-
     // esto es lo equivalente a un onLoad() -- carga inicial    
     useEffect(() => {
         getFlows();
@@ -82,7 +80,6 @@ export default function Flows() {
                         <small>
                             <nav aria-label="breadcrumb">
                                 <ol className="breadcrumb float-end">
-                                    {/* <li className="breadcrumb-item">Authorization Memos</li> */}
                                     <li className="breadcrumb-item active" aria-current="page">Flows</li>
                                 </ol>
                             </nav>
@@ -93,12 +90,12 @@ export default function Flows() {
                 {/* page content starts here */}
                 <div className="container table-responsive mt-4" style={{fontSize:"87%"}}>
                     <div className="row mb-2">
-                        <div className="col-md-6">
+                        {/* <div className="col-md-6">
                             <button className="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#modal-add-flow">
                                 <i className="bi bi-plus-circle" /> Add Flow
                             </button>
-                        </div>
-                        <div className="col-md-6 mb-3">
+                        </div> */}
+                        <div className="col-md-12 mb-3">
                             <input className="form-control form-control-sm" value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search Flow Info" />
                         </div>
                     </div>
@@ -108,7 +105,7 @@ export default function Flows() {
                                 <th>Plant/Department</th>
                                 <th>Approver</th>
                                 <th>Approver Employee ID</th>
-                                <th>View</th>
+                                {/* <th>View</th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -116,12 +113,12 @@ export default function Flows() {
                             <tr key={flow.iD_FLOW}>
                                 <td>{flow.filter}</td>
                                 <td>{flow.stepName}</td>
-                                <td>{flow.list}</td>
-                                <td>
+                                <td>{flow.director}</td>
+                                {/* <td>
                                     <button className="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#modal-edit-flow" onClick={() => setSelectedFlow(flow)}>
                                         Edit
                                     </button>
-                                </td>
+                                </td> */}
                             </tr>
                             ))}
                         </tbody>

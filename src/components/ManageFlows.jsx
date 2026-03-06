@@ -13,7 +13,7 @@ export default function ManageFlows () {
         setLoading(true);
         setError("");
 
-         fetch("http://localhost:5134/ApprovalFlow/GetDepartments?plant=" + plant)
+         fetch("https://ime-oa.inventec.com:460/AuthMemo/ApprovalFlow/GetDepartments?plant=" + plant)
         .then(res => res.json())
         .then(data => {
             console.log(data.data);

@@ -10,9 +10,10 @@ export default function Index() {
         setLoading(true);
         setError("");
 
-        fetch("http://localhost:5134/AuthMemos/GetAuthMemos", {
+        fetch("https://ime-oa.inventec.com:460/AuthMemo/AuthMemos/GetAuthMemos", {
             method: "get",
-            headers: { "Content-Type" : "application/json" }
+            headers: { "Content-Type" : "application/json" },
+            credentials: "include",
         })
         .then((res) => {
             if (!res.ok)

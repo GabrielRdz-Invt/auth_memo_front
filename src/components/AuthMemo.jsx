@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 
 const init_data = {
@@ -21,13 +21,20 @@ const init_data = {
     expiration_date : '',
     plant: '',
     department: '',
+    added_by: '',
 };
 
-export default function AuthMemo() {
+const departments_by_plant = {
+    IME: ["MRO", "EHS", "IT", "SECURITY", "LOGISTICS"],
+    IMP: ["MRO"],
+}
+
+export default function AuthMemo({badge}) {
     const [form, setForm] = useState(init_data);
     const [folio, setFolio] = useState("");
     const [showInput, setShowInput] = useState(false);
     const [contractFile, setContractFile] = useState(null);
+    const fileInputRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
     // cambio de valores en inputs
@@ -35,7 +42,13 @@ export default function AuthMemo() {
         const name = e.target.name;
         const value = e.target.value;
         // console.log(name+": "+value);
-        
+        if(name === "plant")
+        {
+            const allowed = departments_by_plant[value] || [];
+            const next_department = allowed.includes(form.department) ? form.department : "";
+            setForm({...form, plant: value, department: next_department});
+            return;
+        }
         setForm({...form, [name]:value});
     }
 
@@ -74,12 +87,14 @@ export default function AuthMemo() {
                             _contract_genre : genre_to_send,
                             price_amount: Number(form.price_amount),
                             _contract_path: path,
+                            added_by: badge,
                         }
                         
-                        fetch("http://localhost:5134/AuthMemos/PostAuthMemo", {
+                        fetch("https://ime-oa.inventec.com:460/AuthMemo/AuthMemos/PostAuthMemo", {
                             method: "post",
                             headers: {"Content-Type" : "application/json"},
                             body: JSON.stringify(payload),
+                            credentials: "include",
                         })
                         .then(res => res.json())
                         .then(data => {
@@ -88,6 +103,9 @@ export default function AuthMemo() {
                             loadFolio(); // volver a poner el folio
                             setContractFile(null);
                             setForm(init_data); // limpiar el form al terminar de usarse
+                            if (fileInputRef.current) {
+                                fileInputRef.current.value = ""; // limpiar el input de tipo file
+                            }
                         })
                         .catch(error => {
                             setLoading(false);
@@ -112,16 +130,16 @@ export default function AuthMemo() {
         }
 
         if (form._contract_genre === "Other"){
-            console.log("alisa meu pelo");
             setShowInput(true);
         }
     }, [form._contract_genre]);
 
     // helpers
     function loadFolio(){
-        fetch("http://localhost:5134/AuthMemos/GetMemoFolio", {
+        fetch("https://ime-oa.inventec.com:460/AuthMemo/AuthMemos/GetMemoFolio", {
             method: "get",
-            headers: { "Content-Type" : "application/json" }
+            headers: { "Content-Type" : "application/json" },
+            credentials: "include",
         })
         .then(res => res.json())
         .then((data) => {
@@ -147,9 +165,10 @@ export default function AuthMemo() {
             form_data.append("contract_file", contractFile);
             form_data.append("folio_memo", folio);
             
-            fetch("http://localhost:5134/AuthMemos/UploadContract", {
+            fetch("https://ime-oa.inventec.com:460/AuthMemo/AuthMemos/UploadContract", {
                 method: "post",
                 body: form_data,
+                credentials: "include",
             })
             .then(res => res.json())
             .then(data => {
@@ -203,20 +222,20 @@ export default function AuthMemo() {
                             <small className="text-muted">Mandatory fields are marked with <strong className="text-danger">*</strong>.</small>
                         </div>
                         <div className="col-md-3">
-                            <small className="form-label">Department: <strong className="text-danger">*</strong></small>
-                            <select name="department" id="department" className="form-control form-control-sm" value={form.department} onChange={inputChange}>
-                                <option value="">-- Select Department --</option>
-                                <option value="MRO">MRO</option>
-                                <option value="SECURITY">Security</option>
-                                <option value="IT">IT</option>
-                            </select>
-                        </div>
-                        <div className="col-md-3">
                             <small className="form-label">Plant: <strong className="text-danger">*</strong></small>
                             <select name="plant" id="plant" className="form-control form-control-sm" value={form.plant} onChange={inputChange}>
                                 <option value="">-- Select Plant --</option>
                                 <option value="IME">IME</option>
                                 <option value="IMP">IMP</option>
+                            </select>
+                        </div>
+                        <div className="col-md-3">
+                            <small className="form-label">Department: <strong className="text-danger">*</strong></small>
+                            <select name="department" id="department" className="form-control form-control-sm" value={form.department} onChange={inputChange} disabled={form.plant === ""}>
+                                <option value="">-- Select Department --</option>
+                                {(departments_by_plant[form.plant] || []).map((dept) => (
+                                    <option key={dept} value={dept}>{dept}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -328,7 +347,7 @@ export default function AuthMemo() {
                         <div className="col-md-6">
                             <label className="form-label">Upload File: <strong className="text-danger">*</strong></label>
                             <div className="input-group">
-                                <input type="file" className="form-control" name="contract_file"
+                                <input ref={fileInputRef} type="file" className="form-control" name="contract_file"
                                     onChange={(e) => setContractFile(e.target.files && e.target.files[0] ? e.target.files[0] : null)}
                                     accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" />
                             </div>

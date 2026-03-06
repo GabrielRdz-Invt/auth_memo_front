@@ -8,7 +8,8 @@ export default defineConfig({
   server: {
     proxy : {
       '/api' : {
-        target: 'http://localhost:5134/api',
+        // target: 'http://localhost:5134/',
+        target: 'https://ime-oa.inventec.com:471/',
         changeOrigin : true,
         secure: false
       }
